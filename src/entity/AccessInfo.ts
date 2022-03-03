@@ -7,22 +7,19 @@ import {
 } from 'typeorm'
 
 @Entity()
-export class HitCount extends BaseEntity {
+export class AccessInfo extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string
 
   @Column()
   remoteAddress: string
 
-  @Column()
-  pathname: string
-
   @CreateDateColumn()
-  accessedAt!: Date
+  accessedAt: Date
 
-  constructor(remoteAddress: string, pathname: string) {
+  constructor(remoteAddress: string, accessedAt: Date) {
     super()
     this.remoteAddress = remoteAddress
-    this.pathname = pathname
+    this.accessedAt = accessedAt
   }
 }

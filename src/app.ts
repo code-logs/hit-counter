@@ -1,9 +1,10 @@
-import express from 'express'
-import path from 'path'
 import dotenv from 'dotenv'
-import cors from 'cors'
-import { HitCount } from './entity/HitCount'
-import { createConnection } from 'typeorm'
+import express, { Express } from 'express'
+import path from 'path'
+import { createConnection, EntitySchema } from 'typeorm'
+import registerControllers from './controllers'
+import entities from './entity'
+import registerMiddleware from './middleware'
 
 dotenv.config({
   path: path.resolve(process.cwd(), '.env', `.env.${process.env.NODE_ENV}`),
@@ -12,24 +13,43 @@ dotenv.config({
 if (!process.env.PORT) throw new Error('Server port is not specified.')
 if (!process.env.ALLOW_HOST) throw new Error('ALLOW_HOST is not specified.')
 
-const PORT = Number(process.env.PORT)
-const ALLOW_HOST = process.env.ALLOW_HOST
-console.log(ALLOW_HOST)
+export const connectDatabase = async (entities: EntitySchema<unknown>[]) => {
+  const database = process.env.DATABASE
+  const synchronize = process.env.NODE_ENV === 'development'
+
+  if (!database) throw new Error('Database configuration is required')
+
+  try {
+    console.log('Start to connect database')
+    const connection = await createConnection({
+      type: 'sqlite',
+      database,
+      synchronize,
+      entities,
+      logging: true,
+    })
+    console.log('Database connection is established')
+
+    return connection
+  } catch (e) {
+    throw (e as Error).message
+  }
+}
+
+const launchServer = (app: Express) => {
+  const PORT = Number(process.env.PORT)
+
+  app.listen(PORT, () => {
+    console.log(`Server is running on ${PORT}`)
+  })
+}
+
+const bootstrap = async (app: Express) => {
+  await connectDatabase(entities as EntitySchema<unknown>[])
+  registerMiddleware(app)
+  registerControllers(app)
+  launchServer(app)
+}
 
 const app = express()
-app.use(cors({ origin: ALLOW_HOST }))
-
-app.get('/', (req, res) => {
-  res.send('Hello World')
-})
-
-app.listen(PORT, async () => {
-  await createConnection({
-    type: 'sqlite',
-    database: 'sqlite.db',
-    synchronize: true,
-    logging: true,
-    entities: [HitCount],
-  })
-  console.log(`Server is running on ${PORT}`)
-})
+bootstrap(app)
