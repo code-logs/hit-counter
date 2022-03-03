@@ -9,14 +9,13 @@
     "clean": "rm -rf ./dist",
     "build": "tsc",
     "serve": "NODE_ENV=development nodemon --watch src --exec 'node --inspect -r ts-node/register ./src/app.ts'",
-    "start": "NODE_ENV=production node dist/app.js",
+    "start": "NODE_ENV=production node ./dist/app.js",
     "typecheck": "tsc --noEmit --esModuleInterop --experimentalDecorators --emitDecoratorMetadata",
     "prettier": "prettier -w ./src/**/*",
     "eslint": "eslint ./src/**/*",
     "prepare": "husky install",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
-    "test": "NODE_ENV=production jest --detectOpenHandles --forceExit",
-    "heroku-postbuild": "npm run build"
+    "test": "NODE_ENV=production jest --detectOpenHandles --forceExit"
   },
   "jest": {
     "preset": "ts-jest"
