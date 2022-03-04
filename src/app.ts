@@ -15,7 +15,6 @@ if (!process.env.ALLOW_HOST) throw new Error('ALLOW_HOST is not specified.')
 
 export const connectDatabase = async (entities: EntitySchema<unknown>[]) => {
   const database = process.env.DATABASE
-  const synchronize = process.env.NODE_ENV === 'development'
 
   if (!database) throw new Error('Database configuration is required')
 
@@ -24,7 +23,7 @@ export const connectDatabase = async (entities: EntitySchema<unknown>[]) => {
     const connection = await createConnection({
       type: 'sqlite',
       database,
-      synchronize,
+      synchronize: true,
       entities,
       logging: true,
     })
