@@ -21,15 +21,19 @@ export class HitCountService {
   }
 
   public static async stamp(remoteAddress: string, pathname: string) {
-    if (await this.isHitToday(remoteAddress, pathname)) return
-
     pathname = this.normalizePathname(pathname)
-    const hitCount = new HitCount(remoteAddress, pathname)
-    await hitCount.save()
+
+    if (!(await this.isHitToday(remoteAddress, pathname))) {
+      const hitCount = new HitCount(remoteAddress, pathname)
+      await hitCount.save()
+    }
+
+    return HitCount.count({ where: { pathname } })
   }
 
   public static async count(pathname: string) {
     pathname = this.normalizePathname(pathname)
+
     return await HitCount.count({
       where: {
         pathname: pathname,

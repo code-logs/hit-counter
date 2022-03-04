@@ -4,14 +4,14 @@ import DateUtil from './DateUtil'
 const InToday = () => {
   const today = DateUtil.today()
   const todayStr = [
-    today.getFullYear(),
-    String(today.getMonth() + 1).padStart(2, '0'),
-    String(today.getDate()).padStart(2, '0'),
+    today.getUTCFullYear(),
+    String(today.getUTCMonth() + 1).padStart(2, '0'),
+    String(today.getUTCDate()).padStart(2, '0'),
   ].join('-')
   const tomorrowStr = [
-    today.getFullYear(),
-    String(today.getMonth() + 1).padStart(2, '0'),
-    String(today.getDate() + 1).padStart(2, '0'),
+    today.getUTCFullYear(),
+    String(today.getUTCMonth() + 1).padStart(2, '0'),
+    String(today.getUTCDate() + 1).padStart(2, '0'),
   ].join('-')
 
   return Between(todayStr, tomorrowStr)

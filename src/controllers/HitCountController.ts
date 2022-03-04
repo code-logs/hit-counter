@@ -1,4 +1,4 @@
-import { Request, Router } from 'express'
+import { Router } from 'express'
 import { TypeORMError } from 'typeorm'
 import { AccessInfoService } from '../services/AccessInfoService'
 import { HitCountService } from '../services/HitCountService'
@@ -15,7 +15,7 @@ hitCountController.get('/', async (req, res) => {
   })
 })
 
-hitCountController.post('/', async (req: Request, res) => {
+hitCountController.post('/', async (req, res) => {
   try {
     const { pathname } = req.body
     if (!pathname) throw new CustomError('No pathname provided', 400)
@@ -23,10 +23,10 @@ hitCountController.post('/', async (req: Request, res) => {
     const remoteAddress = req.socket.remoteAddress
     if (!remoteAddress) throw new CustomError('Internal server error', 500)
 
-    await AccessInfoService.stamp(remoteAddress)
-    await HitCountService.stamp(remoteAddress, pathname)
+    const totalHitCount = await AccessInfoService.stamp(remoteAddress)
+    const pageHitCount = await HitCountService.stamp(remoteAddress, pathname)
 
-    res.json({ success: true })
+    res.json({ totalHitCount, pageHitCount, pathname })
   } catch (e) {
     if (e instanceof CustomError) {
       res.status(e.code).send(e.message)

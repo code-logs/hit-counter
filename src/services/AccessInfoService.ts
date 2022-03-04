@@ -14,9 +14,12 @@ export class AccessInfoService {
   }
 
   public static async stamp(remoteAddress: string) {
-    if (!(await this.isAccessedToday(remoteAddress))) {
+    const isAccessedToday = await this.isAccessedToday(remoteAddress)
+    if (!isAccessedToday) {
       const accessInfo = new AccessInfo(remoteAddress, new Date())
       await accessInfo.save()
     }
+
+    return AccessInfo.count()
   }
 }
